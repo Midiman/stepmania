@@ -4,7 +4,8 @@ local loggedOnSMO = IsNetSMOnline();
 local t = Def.ActorFrame{
 	Def.Quad {
 		InitCommand=cmd(y,-12;x,160;zoomto,320+32,38;vertalign,top;diffuse,Color.Black;diffusealpha,0.5);
-		OnCommand=cmd(faderight,0.45);
+		OnCommand=cmd(finishtweening;faderight,0.45);
+		OffCommand=cmd(finishtweening;linear,0.3;diffusealpha,0);
 		BeginCommand=function(self)
 			if netConnected then
 				self:zoomtoheight( 38 );
@@ -15,6 +16,8 @@ local t = Def.ActorFrame{
 	};
 	LoadFont("Common Normal") .. {
 		InitCommand=cmd(uppercase,true;zoom,0.75;shadowlength,1;horizalign,left);
+		OnCommand=cmd(diffusealpha,0;linear,0.25;diffusealpha,1);
+		OffCommand=cmd(finishtweening;linear,0.3;diffusealpha,0);
 		BeginCommand=function(self)
 			-- check network status
 			if netConnected then

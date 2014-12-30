@@ -47,4 +47,9 @@ local bg = Def.ActorFrame{
 	};
 };
 
+bg[#bg+1] = LoadActor(THEME:GetPathB("ScreenWithMenuElements", "out")) .. {
+	OnCommand=cmd(finishtweening;diffusealpha,0);
+	OffCommand=cmd(diffusealpha,0;sleep,2.5;visible,true;linear,0.5;diffusealpha,1)
+}
+
 return bg

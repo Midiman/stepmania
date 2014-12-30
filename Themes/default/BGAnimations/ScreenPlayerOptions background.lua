@@ -19,11 +19,11 @@ t[#t+1] = Def.ActorFrame {
 	};
 	Def.Quad {
 		InitCommand=cmd(Center;scaletoclipped,SCREEN_WIDTH+1,SCREEN_HEIGHT);
-		OnCommand=cmd(diffuse,color("#FFCB05");diffusebottomedge,color("#F0BA00");diffusealpha,0.45);
+		OnCommand=cmd(diffusealpha,0;diffuse,color("#FFCB05");diffusebottomedge,color("#F0BA00");linear,1;diffusealpha,0.45);
 	};
 	LoadActor(THEME:GetPathB("ScreenWithMenuElements","background/_bg top")) .. {
 		InitCommand=cmd(Center;scaletoclipped,SCREEN_WIDTH+1,SCREEN_HEIGHT);
-		OnCommand=cmd(diffusealpha,0.5);
+		OnCommand=cmd(finishtweening;diffusealpha,0;linear,1;diffusealpha,0.5);
 	};
 };
 return t

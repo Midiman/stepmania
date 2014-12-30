@@ -1,5 +1,5 @@
 if PREFSMAN:GetPreference( "ShowSongOptions" ) ~= "Maybe_Ask" then
-	return LoadActor( THEME:GetPathB("Screen", "out") );
+	return LoadActor( THEME:GetPathB("ScreenWithMenuElements", "out") );
 end
 
 local t = Def.ActorFrame {

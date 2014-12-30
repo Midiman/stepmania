@@ -7,7 +7,7 @@ local fSleepTime = THEME:GetMetric( Var "LoadingScreen","ScreenOutDelay");
 	self:y( scale(iY,1,iTilesY,-SCREEN_CENTER_Y,SCREEN_CENTER_Y) );
 end --]]
 local t = Def.ActorFrame {
-	InitCommand=cmd(x,SCREEN_CENTER_X;y,SCREEN_CENTER_Y);
+	InitCommand=cmd(x,SCREEN_WIDTH-32;y,SCREEN_HEIGHT-32);
 	OnCommand=cmd(sleep,fSleepTime);
 };
 --[[ for indx=1,iTilesX do
@@ -21,9 +21,13 @@ local t = Def.ActorFrame {
 		};
 	end
 end --]]
-t[#t+1] = Def.Quad {
-	InitCommand=cmd(zoomto,SCREEN_WIDTH+1,SCREEN_HEIGHT);
-	OnCommand=cmd(diffuse,color("0,0,0,0");sleep,0.0325 + fSleepTime;linear,0.15;diffusealpha,1);
+t[#t+1] = Def.ActorFrame {
+	InitCommand=cmd(pulse;effectmagnitude,1,1.25,0;effectclock,'timerglobal';effectperiod,0.45),
+	OnCommand=cmd(sleep,fSleepTime),
+	--
+	LoadActor(THEME:GetPathG("Player","Badge FullCombo")) .. {
+		OffCommand=cmd(diffuse,Color.Yellow;zoom,0;diffusealpha,0;linear,0.1;zoom,1;diffusealpha,1)
+	}
 };
 --[[ return Def.ActorFrame {
 	Def.Quad {
