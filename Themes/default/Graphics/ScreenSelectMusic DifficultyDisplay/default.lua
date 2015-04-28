@@ -41,7 +41,7 @@ for idx,diff in pairs(Difficulty) do
 -- 			local Meter = self:GetChild("Meter"
 			local song = GAMESTATE:GetCurrentSong()
 			local bHasStepsTypeAndDifficulty = false;
-			local meter = "";
+			local meter = diff == 'Difficulty_Edit' and "0 Edits" or "-";
 			if song then
 				local st = GAMESTATE:GetCurrentStyle():GetStepsType()
 				bHasStepsTypeAndDifficulty = song:HasStepsTypeAndDifficulty( st, diff );
@@ -52,7 +52,7 @@ for idx,diff in pairs(Difficulty) do
 					--
 					if diff == 'Difficulty_Edit' then
 						meter = GetEdits( song, st );
-						append = ( GetEdits( song, st ) > 1 ) and "Edits" or "Edit"
+						append = ( GetEdits( song, st ) ~= 1 ) and "Edits" or "Edit"
 						meter = meter .. " " .. append
 					end
 				end

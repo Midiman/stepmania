@@ -43,8 +43,7 @@ local function PercentScore(pn)
 				local diff = StepsOrTrail:GetDifficulty();
 				local courseType = GAMESTATE:IsCourseMode() and SongOrCourse:GetCourseType() or nil;
 				local cd = GetCustomDifficulty(st, diff, courseType);
-				self:diffuse(CustomDifficultyToColor(cd));
-				self:shadowcolor(CustomDifficultyToDarkColor(cd));
+				self:diffuse(CustomDifficultyToLightColor(cd));
 
 				if PROFILEMAN:IsPersistentProfile(pn) then
 					-- player profile
@@ -110,11 +109,26 @@ for pn in ivalues(PlayerNumber) do
 	end;
 end
 
+for pn in ivalues(PlayerNumber) do
+	local MetricsName = "PaneDisplay" .. PlayerNumberToString(pn);
+	if ShowStandardDecoration("PaneDisplay"..ToEnumShortString(pn)) then
+		t[#t+1] = LoadActor(THEME:GetPathG(Var "LoadingScreen", "PaneDisplay"), pn) .. {
+			InitCommand=function(self) self:player(pn) self:name(MetricsName); ActorUtil.LoadAllCommandsAndSetXY(self,Var "LoadingScreen"); end;
+			PlayerJoinedMessageCommand=function(self, params)
+				if params.Player == iPN then
+					self:visible(true)
+				end
+			end,
+			PlayerUnjoinedMessageCommand=function(self, params)
+				if params.Player == iPN then
+					self:visible(false)
+				end
+			end
+		}
+	end;
+end
+
 t[#t+1] = StandardDecorationFromFileOptional("BannerFrame","BannerFrame");
-t[#t+1] = StandardDecorationFromFileOptional("PaneDisplayFrameP1","PaneDisplayFrame");
-t[#t+1] = StandardDecorationFromFileOptional("PaneDisplayFrameP2","PaneDisplayFrame");
-t[#t+1] = StandardDecorationFromFileOptional("PaneDisplayTextP1","PaneDisplayTextP1");
-t[#t+1] = StandardDecorationFromFileOptional("PaneDisplayTextP2","PaneDisplayTextP2");
 t[#t+1] = StandardDecorationFromFileOptional("DifficultyList","DifficultyList");
 
 t[#t+1] = StandardDecorationFromFileOptional("BPMDisplay","BPMDisplay");

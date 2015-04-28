@@ -1,5 +1,5 @@
 local iPN = ...;
-assert(iPN,"[Graphics/PaneDisplay text.lua] No PlayerNumber Provided.");
+assert(iPN,"No PlayerNumber Provided.");
 
 local t = Def.ActorFrame {};
 local function GetRadarData( pnPlayer, rcRadarCategory )
@@ -23,12 +23,12 @@ local function CreatePaneDisplayItem( _pnPlayer, _sLabel, _rcRadarCategory )
 		LoadFont("Common SemiBold") .. {
 			Text=string.upper( THEME:GetString("PaneDisplay",_sLabel) );
 			InitCommand=cmd(horizalign,left);
-			OnCommand=cmd(zoom,0.5875;diffuse,color("0.9,0.9,0.9");shadowlength,1);
+			OnCommand=cmd(zoom,0.5875;strokecolor,Color.Outline;shadowlength,1);
 		};
 		LoadFont("Common Normal") .. {
 			Text=string.format("%04i", 0);
 			InitCommand=cmd(x,96;horizalign,right);
-			OnCommand=cmd(zoom,0.5875;shadowlength,1);
+			OnCommand=cmd(zoom,0.5;shadowlength,1);
 			CurrentSongChangedMessageCommand=cmd(playcommand,"Set");
 			CurrentStepsP1ChangedMessageCommand=cmd(playcommand,"Set");
 			CurrentStepsP2ChangedMessageCommand=cmd(playcommand,"Set");
@@ -39,9 +39,9 @@ local function CreatePaneDisplayItem( _pnPlayer, _sLabel, _rcRadarCategory )
 				local song = GAMESTATE:GetCurrentSong()
 				local course = GAMESTATE:GetCurrentCourse()
 				if not song and not course then
-					self:settextf("%04i", 0);
+					self:settextf("%i", 0);
 				else
-					self:settextf("%04i", GetRadarData( _pnPlayer, _rcRadarCategory ) );
+					self:settextf("%i", GetRadarData( _pnPlayer, _rcRadarCategory ) );
 				end
 			end;
 		};
@@ -106,31 +106,57 @@ end;
 
 --[[ Numbers ]]
 t[#t+1] = Def.ActorFrame {
+	LoadActor("_background") .. {
+		CurrentSongChangedMessageCommand=cmd(playcommand,"Set");
+		CurrentStepsP1ChangedMessageCommand=cmd(playcommand,"Set");
+		CurrentStepsP2ChangedMessageCommand=cmd(playcommand,"Set");
+		CurrentTrailP1ChangedMessageCommand=cmd(playcommand,"Set");
+		CurrentTrailP2ChangedMessageCommand=cmd(playcommand,"Set");
+		CurrentCourseChangedMessageCommand=cmd(playcommand,"Set");
+		SetCommand=function(self)
+			local stepsOrTrail = nil;
+			if GAMESTATE:GetCurrentSteps( iPN ) then
+				stepsOrTrail = GAMESTATE:GetCurrentSteps( iPN )
+			elseif GAMESTATE:GetCurrentTrail( iPN ) then
+				stepsOrTrail = GAMESTATE:GetCurrentTrail( iPN )
+			else
+				return
+			end
+
+			if stepsOrTrail ~= nil then
+				local cd = StepsOrTrailToCustomDifficulty( stepsOrTrail )
+				self:diffuse( CustomDifficultyToColor( cd ) )
+			end
+		end
+	},
 	-- Left 
 	CreatePaneDisplayItem( iPN, "Taps", 'RadarCategory_TapsAndHolds' ) .. {
-		InitCommand=cmd(x,-128+16+8;y,-14);
-	};
+		InitCommand=cmd(x,-128+16+8;y,-24);
+	},
 	CreatePaneDisplayItem( iPN, "Jumps", 'RadarCategory_Jumps' ) .. {
-		InitCommand=cmd(x,-128+16+8;y,-14+16);
-	};
+		InitCommand=cmd(x,-128+16+8;y,-24+16);
+	},
 	CreatePaneDisplayItem( iPN, "Holds", 'RadarCategory_Holds' ) .. {
-		InitCommand=cmd(x,-128+16+8;y,-14+16*2);
-	};
+		InitCommand=cmd(x,-128+16+8;y,-24+16*2);
+	},
 	CreatePaneDisplayItem( iPN, "Mines", 'RadarCategory_Mines' ) .. {
-		InitCommand=cmd(x,-128+16+8;y,-14+16*3);
-	};
+		InitCommand=cmd(x,-128+16+8;y,-24+16*3);
+	},
 	-- Center
 	CreatePaneDisplayItem( iPN, "Hands", 'RadarCategory_Hands' ) .. {
-		InitCommand=cmd(x,8;y,-14);
-	};
+		InitCommand=cmd(x,8;y,-24);
+	},
 	CreatePaneDisplayItem( iPN, "Rolls", 'RadarCategory_Rolls' ) .. {
-		InitCommand=cmd(x,8;y,-14+16);
-	};
+		InitCommand=cmd(x,8;y,-24+16);
+	},
 	CreatePaneDisplayItem( iPN, "Lifts", 'RadarCategory_Lifts' ) .. {
-		InitCommand=cmd(x,8;y,-14+16*2);
-	};
+		InitCommand=cmd(x,8;y,-24+16*2);
+	},
 	CreatePaneDisplayItem( iPN, "Fakes", 'RadarCategory_Fakes' ) .. {
-		InitCommand=cmd(x,8;y,-14+16*3);
-	};
+		InitCommand=cmd(x,8;y,-24+16*3);
+	},
 };
+
+
+
 return t;
