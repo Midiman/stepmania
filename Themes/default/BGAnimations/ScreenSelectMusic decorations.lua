@@ -115,12 +115,12 @@ for pn in ivalues(PlayerNumber) do
 		t[#t+1] = LoadActor(THEME:GetPathG(Var "LoadingScreen", "PaneDisplay"), pn) .. {
 			InitCommand=function(self) self:player(pn) self:name(MetricsName); ActorUtil.LoadAllCommandsAndSetXY(self,Var "LoadingScreen"); end;
 			PlayerJoinedMessageCommand=function(self, params)
-				if params.Player == iPN then
+				if params.Player == pn then
 					self:visible(true)
 				end
 			end,
 			PlayerUnjoinedMessageCommand=function(self, params)
-				if params.Player == iPN then
+				if params.Player == pn then
 					self:visible(false)
 				end
 			end
