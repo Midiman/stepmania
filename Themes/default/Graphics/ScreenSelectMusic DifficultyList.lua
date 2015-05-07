@@ -12,16 +12,19 @@ return Def.ActorFrame {
 		end;
 	end;
 	Def.Quad {
-		InitCommand=cmd(y,-14;zoomto,256,2;fadeleft,8/164;faderight,8/164);
+		InitCommand=cmd(y,-14;zoomto,256,2;);
 		OnCommand=cmd(diffuse,Color("Black");diffusealpha,0;linear,0.35;diffusealpha,0.5);
 	};
 	Def.Quad {
-		InitCommand=cmd(y,24*(5)-10;zoomto,256,2;fadeleft,8/164;faderight,8/164);
+		InitCommand=cmd(y,24*(5)-10;zoomto,256,2;);
 		OnCommand=cmd(diffuse,Color("Black");diffusealpha,0;linear,0.35;diffusealpha,0.5);
 	};
 	Def.StepsDisplayList {
 		Name="StepsDisplayListRow";
-
+		--
+		TweenOnCommand=cmd(stoptweening;decelerate,0.1;zoomx,1),
+		TweenOffCommand=cmd(stoptweening;accelerate,0.2;zoomx,0),
+		--
 		CursorP1 = Def.ActorFrame {
 			InitCommand=cmd(x,-128+16;player,PLAYER_1);
 			PlayerJoinedMessageCommand=function(self, params)

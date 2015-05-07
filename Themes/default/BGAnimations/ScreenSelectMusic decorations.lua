@@ -86,7 +86,7 @@ local function PercentScore(pn)
 	return t;
 end
 
--- Legacy StepMania 4 Function
+--[[ Legacy StepMania 4 Function
 for pn in ivalues(PlayerNumber) do
 	local MetricsName = "StepsDisplay" .. PlayerNumberToString(pn);
 	t[#t+1] = StepsDisplay(pn) .. {
@@ -108,6 +108,7 @@ for pn in ivalues(PlayerNumber) do
 		t[#t+1] = StandardDecorationFromTable("PercentScore"..ToEnumShortString(pn), PercentScore(pn));
 	end;
 end
+]]
 
 for pn in ivalues(PlayerNumber) do
 	local MetricsName = "PaneDisplay" .. PlayerNumberToString(pn);
@@ -244,6 +245,7 @@ if GAMESTATE:IsCourseMode() then
 		};
 		Def.Quad {
 			InitCommand=cmd(
+
 				x,THEME:GetMetric(Var "LoadingScreen","CourseContentsListX");
 				y,THEME:GetMetric(Var "LoadingScreen","CourseContentsListY") + 186;
 				zoomto,256+32,64;

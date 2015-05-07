@@ -1,35 +1,27 @@
-local t = Def.ActorFrame {};
+local tile_width = SCREEN_WIDTH
+local tile_height = 96
+local tile_size = 48
+local tile_scroll_rate = 0.2
+local t = Def.ActorFrame {}
 
 t[#t+1] = Def.ActorFrame {
-  FOV=90;
-  InitCommand=cmd(Center);
+  FOV=90,
+  InitCommand=cmd(Center),
 	Def.Quad {
-		InitCommand=cmd(scaletoclipped,SCREEN_WIDTH,SCREEN_HEIGHT);
-		OnCommand=cmd(diffuse,color("#FFCB05");diffusebottomedge,color("#F0BA00"));
-	};
+		InitCommand=cmd(scaletoclipped,SCREEN_WIDTH,SCREEN_HEIGHT),
+		OnCommand=cmd(diffuse,ThemeColor.BackgroundDark),
+	},
 	Def.ActorFrame {
-		InitCommand=cmd(hide_if,hideFancyElements;);
 		LoadActor("_checkerboard") .. {
-			InitCommand=cmd(rotationy,0;rotationz,0;rotationx,-90/4*3.5;zoomto,SCREEN_WIDTH*2,SCREEN_HEIGHT*2;customtexturerect,0,0,SCREEN_WIDTH*4/256,SCREEN_HEIGHT*4/256);
-			OnCommand=cmd(texcoordvelocity,0,0.25;diffuse,color("#ffd400");fadetop,1);
-		};
-	};
-	LoadActor("_particleLoader") .. {
-		InitCommand=cmd(x,-SCREEN_CENTER_X;y,-SCREEN_CENTER_Y;hide_if,hideFancyElements;);
-	};
---[[ 	LoadActor("_particles") .. {
-		InitCommand=cmd(x,-SCREEN_CENTER_X;y,-SCREEN_CENTER_Y);
-	}; --]]
---[[ 	LoadActor("_pattern") .. {
-		InitCommand=cmd(z,32;x,4;y,4;;rotationy,-12.25;rotationz,-30;rotationx,-20;zoomto,SCREEN_WIDTH*2,SCREEN_HEIGHT*2;customtexturerect,0,0,SCREEN_WIDTH*4/256,SCREEN_HEIGHT*4/256);
-		OnCommand=cmd(texcoordvelocity,0.125,0.5;diffuse,Color("Black");diffusealpha,0.5);
-	}; --]]
-	--[[ LoadActor("_grid") .. {
-		InitCommand=cmd(customtexturerect,0,0,(SCREEN_WIDTH+1)/4,SCREEN_HEIGHT/4;SetTextureFiltering,true);
-		OnCommand=cmd(zoomto,SCREEN_WIDTH+1,SCREEN_HEIGHT;diffuse,Color("Black");diffuseshift;effecttiming,(1/8)*2,0,(7/8)*2,0;effectclock,'beatnooffset';
-		effectcolor2,Color("White");effectcolor1,Color("Black");fadebottom,0.25;fadetop,0.25;croptop,48/480;cropbottom,48/480;blend,Blend.Add;
-		diffusealpha,0.155);
-	}; --]]		
-};
+			InitCommand=cmd(y,-SCREEN_CENTER_Y;vertalign,top;zoomto,tile_width,tile_height+48),
+			OnCommand=cmd(customtexturerect,0,0,tile_width/tile_size,(tile_height+48)/tile_size;texcoordvelocity,tile_scroll_rate,0;diffuse,ThemeColor.Background;fadebottom,0.25),
+		},
+		-- Bottom
+		LoadActor("_checkerboard") .. {
+			InitCommand=cmd(y,SCREEN_CENTER_Y;vertalign,bottom;zoomto,tile_width,tile_height+32),
+			OnCommand=cmd(customtexturerect,0,0,tile_width/tile_size,(tile_height+32)/tile_size;texcoordvelocity,-tile_scroll_rate,0;diffuse,ThemeColor.Background;fadetop,0.25),
+		}
+	}
+}
 
-return t;
+return t

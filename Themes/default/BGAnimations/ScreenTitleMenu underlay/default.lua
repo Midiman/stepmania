@@ -1,4 +1,5 @@
 return Def.ActorFrame {
+	InitCommand=cmd(visible,false),
 	Def.Quad {
 		InitCommand=cmd(horizalign,left;vertalign,top;y,SCREEN_TOP+8);
 		OnCommand=cmd(diffuse,Color.Black;diffusealpha,0.5;zoomto,256,84;faderight,1);

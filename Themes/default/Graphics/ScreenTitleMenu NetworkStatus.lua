@@ -2,6 +2,7 @@ local netConnected = IsNetConnected();
 local loggedOnSMO = IsNetSMOnline();
 
 local t = Def.ActorFrame{
+	BeginCommand=cmd(visible,netConnected),
 	Def.Quad {
 		InitCommand=cmd(y,-12;x,160;zoomto,320+32,38;vertalign,top;diffuse,Color.Black;diffusealpha,0.5);
 		OnCommand=cmd(faderight,0.45);
