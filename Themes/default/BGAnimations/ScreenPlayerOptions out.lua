@@ -1,9 +1,9 @@
 if PREFSMAN:GetPreference( "ShowSongOptions" ) ~= "Maybe_Ask" then
-	return LoadActor( THEME:GetPathB("Screen", "out") );
+	return LoadActor( THEME:GetPathB("_menu", "out") );
 end
 
 local t = Def.ActorFrame {
-	LoadActor( THEME:GetPathB("Screen", "out") );
+	LoadActor( THEME:GetPathB("_menu", "out") );
 
 	LoadFont( "common normal" ) .. {
 		InitCommand=cmd(settext,"Press &START; for more options";x,SCREEN_CENTER_X;y,SCREEN_CENTER_Y+100;visible,false);

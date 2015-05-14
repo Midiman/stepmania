@@ -10,14 +10,14 @@ ThemeColor = {
 	Text			= color("#ffffff"),
 	TextDark		= color("#e6e9ed"),
 	TextDisabled = color("#8a8c8e"),
-	Primary			= color("#F1C40F"),
+	Primary			= color("#F1C40F"), --#FFCC00
 	PrimaryDark		= color("#F39C12"),
 	Secondary		= color("#ffbb33"),
 	SecondaryDark	= color("#ff8800"),
 	Decoration		= color("#efebe9"),
 	DecorationDark	= color("#cecdc3"),
-	DecorationBackground = color("#2C3E50"),
-	DecorationBackgroundDark = color("#202D3A"),
+	DecorationBackground = color("#3E3E3E"),
+	DecorationBackgroundDark = color("#2D2D2D"),
 	Background		= color("#292929"),
 	BackgroundDark	= color("#161616"),
 }

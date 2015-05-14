@@ -36,22 +36,29 @@ t[#t+1] = LoadActor("_texture stripe") .. {
 }
 
 -- Text
-t[#t+1] = Def.Quad {
-	Name="Underline",
-	InitCommand=cmd(x,-SCREEN_CENTER_X+24;y,36;horizalign,left),
-	OnCommand=cmd(stoptweening;visible,IsHeaderTextVisible();diffuse,ThemeColor.Primary;linear,0.25;zoomtowidth,text_width),
-};
-
-t[#t+1] = LoadFont("Common Bold") .. {
-	Name="HeaderText",
-	Text=Screen.String("HeaderText"),
-	InitCommand=cmd(x,-SCREEN_CENTER_X+24;y,26;zoom,1;horizalign,left;shadowlength,0;maxwidth,200;queuecommand,"Set"),
-	OnCommand=cmd(visible,IsHeaderTextVisible();diffuse,ThemeColor.Primary),
+t[#t+1] = Def.ActorFrame {
 	BeginCommand=function(self)
-		text_width = self:GetWidth();
+		local c = self:GetChildren();
+		local width = c.HeaderText:GetWidth()
+		
+		c.Underline:basezoomx(width)
 	end,
-	UpdateScreenHeaderMessageCommand=function(self,param)
-		self:settext(param.Header);
-	end;
-};
+	Def.Quad {
+		Name="Underline",
+		InitCommand=cmd(x,-SCREEN_CENTER_X+24;y,36;horizalign,left),
+		OnCommand=cmd(stoptweening;visible,IsHeaderTextVisible();diffuse,ThemeColor.Primary;zoomx,0;sleep,0.25;smooth,0.25;zoomx,1)
+	},
+	LoadFont("Common Bold") .. {
+		Name="HeaderText",
+		Text=Screen.String("HeaderText"),
+		InitCommand=cmd(x,-SCREEN_CENTER_X+24;y,26;zoom,1;horizalign,left;shadowlength,0;maxwidth,200;queuecommand,"Set"),
+		OnCommand=cmd(visible,IsHeaderTextVisible();diffuse,ThemeColor.Primary),
+		BeginCommand=function(self)
+			text_width = self:GetWidth();
+		end,
+		UpdateScreenHeaderMessageCommand=function(self,param)
+			self:settext(param.Header);
+		end;
+	}
+}
 return t

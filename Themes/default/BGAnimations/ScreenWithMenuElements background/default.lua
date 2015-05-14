@@ -1,7 +1,7 @@
 local tile_width = SCREEN_WIDTH
-local tile_height = 96
-local tile_size = 48
-local tile_scroll_rate = 0.2
+local tile_height = 48
+local tile_size = 24
+local tile_scroll_rate = 0.32
 local t = Def.ActorFrame {}
 
 t[#t+1] = Def.ActorFrame {

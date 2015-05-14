@@ -1,13 +1,15 @@
 local x = Def.ActorFrame{
+	OnCommand=cmd(Center;zoomy,0;decelerate,0.5;zoomy,1),
+	OffCommand=cmd(finishtweening;zoomy,1;accelerate,0.35;zoomy,0),
+	--
 	Def.Quad{
-		InitCommand=cmd(Center;zoomto,SCREEN_WIDTH,80;diffuse,color("0,0,0,0.5"));
+		InitCommand=cmd(zoomto,SCREEN_WIDTH,80;diffuse,color("0,0,0,0.5"));
 		OnCommand=cmd();
 		OffCommand=cmd();
 	};
 	LoadFont("Common Normal")..{
 		Text=ScreenString("Saving Profiles");
-		InitCommand=cmd(Center;diffuse,color("1,1,1,1");shadowlength,1);
-		OffCommand=cmd(linear,0.15;diffusealpha,0);
+		InitCommand=cmd(diffuse,color("1,1,1,1");shadowlength,1);
 	};
 };
 
