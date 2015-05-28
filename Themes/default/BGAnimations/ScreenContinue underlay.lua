@@ -1,22 +1,6 @@
 local timer_seconds = THEME:GetMetric(Var "LoadingScreen","TimerSeconds");
 local t = Def.ActorFrame {};
 
--- Fade
-t[#t+1] = Def.ActorFrame {
-	InitCommand=cmd(Center);	
-	Def.Quad {
-		InitCommand=cmd(scaletoclipped,SCREEN_WIDTH,SCREEN_HEIGHT);
-		OnCommand=cmd(diffuse,Color.Black;diffusealpha,0;linear,0.5;diffusealpha,0.25;
-					sleep,timer_seconds/2;  
-					linear,timer_seconds/2-0.5;diffusealpha,1);
-	};
-	-- Warning Fade
-	Def.Quad {
-		InitCommand=cmd(y,16;scaletoclipped,SCREEN_WIDTH,148);
-		OnCommand=cmd(diffuse,Color.Black;diffusealpha,0.5;
-					  linear,timer_seconds;zoomtoheight,148*0.75);
-	}
-};
 --
 t[#t+1] = Def.ActorFrame {
 	InitCommand=cmd(Center;y,SCREEN_CENTER_Y-24);
