@@ -15,26 +15,7 @@ Color = {
 	Outline		=	color("0,0,0,0.5"),
 	Invisible	=	color("1,1,1,0"),
 	Stealth		=	color("0,0,0,0"),
--- Android Design Stencil Colors
--- https://developer.android.com/design/style/color.html
-	HoloBlue		= color("#33B5E5"),
-	HoloDarkBlue	= color("#0099CC"),
-	HoloPurple		= color("#AA66CC"),
-	HoloDarkPurple	= color("#9933CC"),
-	HoloGreen		= color("#99CC00"),
-	HoloDarkGreen	= color("#669900"),
-	HoloOrange		= color("#FFBB33"),
-	HoloDarkOrange	= color("#FF8800"),
-	HoloRed			= color("#FF4444"),
-	HoloDarkRed		= color("#CC0000"),
--- Color Functions
--- These functions alter colors in a certain way so that you can make
--- new ones without having to copy a color or find a new one.
---[[     Brightness(fInput)
-    Hue(hInput)
-    Saturation(hInput)
-    Alpha(hInput)
-    HSV(iHue,fSaturation,fValue or any other overload) --]]
+	--
 	Alpha = function(c, fAlpha)
 		return { c[1],c[2],c[3], fAlpha }
 	end
@@ -42,8 +23,21 @@ Color = {
 
 setmetatable(Color, { __call = function(self, c) return self[c] end })
 
--- Remapped Color Module, since some themes are crazy
--- Colors = Color;
+ThemeColor = {
+	Text			= color("#ffffff"),
+	TextDark		= color("#e6e9ed"),
+	TextDisabled = color("#8a8c8e"),
+	Primary			= color("#ed5565"),
+	PrimaryDark		= color("#da4453"),
+	Secondary		= color("#ffbb33"),
+	SecondaryDark	= color("#ff8800"),
+	Decoration		= color("#efebe9"),
+	DecorationDark	= color("#cecdc3"),
+	DecorationBackground = color("#455a64"),
+	DecorationBackgroundDark = color("#263238"),
+	Background		= color("#656d78"),
+	BackgroundDark	= color("#434a54"),
+}
 
 GameColor = {
 	PlayerColors = {
