@@ -18,9 +18,9 @@ local t = Def.ActorFrame {};
 -- Background!
 t[#t+1] = Def.ActorFrame {
 	LoadActor(THEME:GetPathG("ScreenSelectPlayMode","BackgroundFrame")) .. {
-		InitCommand=cmd(diffuse,Color("Black");diffusealpha,0.5);
-		GainFocusCommand=cmd(visible,true);
-		LoseFocusCommand=cmd(visible,false);
+		InitCommand=cmd(diffuse,Color("Black");diffusealpha,0);
+		GainFocusCommand=cmd(stoptweening;smooth,TIME_SHORT;diffusealpha,0.5);
+		LoseFocusCommand=cmd(stoptweening;decelerate,TIME_NORMAL;diffusealpha,0);
 	};
  	LoadActor("_HighlightFrame") .. {
 		InitCommand=cmd(diffuse,icon_color;diffusealpha,0);
@@ -37,8 +37,8 @@ t[#t+1] = Def.ActorFrame {
 	-- Main Emblem
 	LoadActor( gc:GetName() ) .. {
 		InitCommand=cmd(diffusealpha,0;zoom,0.75);
-		GainFocusCommand=cmd(finishtweening;stopeffect;diffusealpha,1;zoom,1;glow,Color("White");decelerate,TIME_SHORT;glow,Color("Invisible");pulse;effectperiod,TIME_LONG;effectmagnitude,0.95,1,1;);
-		LoseFocusCommand=cmd(finishtweening;stopeffect;smooth,TIME_NORMAL;diffusealpha,0;zoom,0.75;glow,Color("Invisible"));
+		GainFocusCommand=cmd(stoptweening;stopeffect;diffusealpha,1;zoom,1;glow,Color("White");decelerate,TIME_SHORT;glow,Color("Invisible");pulse;effectperiod,TIME_LONG;effectmagnitude,0.95,1,1;);
+		LoseFocusCommand=cmd(stoptweening;stopeffect;smooth,TIME_NORMAL;diffusealpha,0;zoom,0.75;glow,Color("Invisible"));
 		OffFocusedCommand=cmd(finishtweening;stopeffect;glow,icon_color;decelerate,TIME_LONG;rotationy,360;glow,Color("Invisible"));
 	};
 };
@@ -68,7 +68,7 @@ t[#t+1] = Def.ActorFrame {
 	};
 };
 
-t.GainFocusCommand=cmd(finishtweening;addy,8;smooth,TIME_NORMAL/2;addy,-16;decelerate,TIME_NORMAL/2;addy,8;diffusealpha,1);
+t.GainFocusCommand=cmd(finishtweening;addy,4;smooth,TIME_NORMAL/2;addy,-8;decelerate,TIME_NORMAL/2;addy,4;diffusealpha,1);
 t.LoseFocusCommand=cmd(stoptweening;accelerate,TIME_NORMAL;zoom,1.125;diffusealpha,0);
 
 return t

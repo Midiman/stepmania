@@ -34,7 +34,8 @@ t[#t+1] = Def.ActorFrame {
 t[#t+1] = LoadActor("_texture stripe") .. {
 	Name="TextureStripe";
 	InitCommand=cmd(x,-SCREEN_CENTER_X-12;y,_height * 0.125;horizalign,left;vertalign,top;zoomto,320,_height * 0.75;customtexturerect,0,0,(320/2)/8,50/32);
-	OnCommand=cmd(texcoordvelocity,2,0;skewx,-0.0575;diffuse,ThemeColor.DecorationBackground;diffusealpha,1;faderight,1);
+	OnCommand=cmd(texcoordvelocity,2,0;skewx,-0.0575;diffuse,ThemeColor.DecorationBackground;faderight,1;
+		accelerate,TIME_SHORT;diffuse,Color.Alpha(ThemeColor.Primary,0.5);decelerate,TIME_NORMAL;diffuse,ThemeColor.DecorationBackground);
 }
 
 -- Text
@@ -45,6 +46,10 @@ t[#t+1] = Def.ActorFrame {
 		
 		c.Underline:basezoomx(c.HeaderText:GetWidth())
 	end,
+	--
+	OnCommand=cmd(finishtweening;addx,-16;diffusealpha,0;decelerate,TIME_NORMAL;addx,16;diffusealpha,1),
+	OffCommand=cmd(finishtweening;accelerate,TIME_NORMAL;addx,64;diffusealpha,0),
+	--
 	Def.Quad {
 		Name="Underline",
 		InitCommand=cmd(x,-SCREEN_CENTER_X+24;y,_height * 0.75;horizalign,left),
@@ -60,4 +65,5 @@ t[#t+1] = Def.ActorFrame {
 		end;
 	}
 }
+
 return t

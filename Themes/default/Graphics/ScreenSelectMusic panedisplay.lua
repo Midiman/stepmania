@@ -135,7 +135,7 @@ best_score[#best_score+1] = Def.ActorFrame {
 			best_score = 0
 			best_grade = "Grade_Failed"
 		end;
-		c.CurrentBest:targetnumber(best_score)
+		c.CurrentBest:settextf("%02.2f%%", best_score)
 		c.GradeDisplay:SetGrade(best_grade)
 	end,
 	CurrentSongChangedMessageCommand=cmd(playcommand,"Set"),
@@ -147,11 +147,9 @@ best_score[#best_score+1] = Def.ActorFrame {
 		InitCommand=cmd(Load,"GradeDisplayEval";x,4;y,-8),
 		OnCommand=cmd(zoom,0.675)
 	},
-	Def.RollingNumbers {
+	LoadFont("Common Normal") ..  {
 		Name="CurrentBest",
-		File=THEME:GetPathF("Common","Normal"),
-		Text="-",
-		InitCommand=cmd(y,24;Load,"RollingNumbersPaneDisplayPercent"),
+		InitCommand=cmd(y,24),
 		OnCommand=cmd(shadowlength,1;zoom,scoreSize)
 	}
 }
@@ -181,21 +179,21 @@ for i=radar_start,#RadarCategory do
 			local song = GAMESTATE:GetCurrentSong()
 			local meter = 0
 			if song == nil then 
-				c.Value:targetnumber(0)
+				c.Value:settextf(format, 0)
 				return
 			end
 
 			local steps = GAMESTATE:GetCurrentSteps(pn)
 			if steps == nil then
-				c.Value:targetnumber(0)
+				c.Value:settextf(format, 0)
 				return
 			end
 			
 			local meter = steps:GetRadarValues(pn):GetValue(rc)
 			if meter ~= nil then
-				c.Value:targetnumber(meter)
+				c.Value:settextf(format, meter)
 			else
-				c.Value:targetnumber(0)
+				c.Value:settextf(format, 0)
 			end
 		end,
 		CurrentSongChangedMessageCommand=cmd(playcommand,"Set"),
@@ -210,12 +208,10 @@ for i=radar_start,#RadarCategory do
 			InitCommand=cmd(),
 			OnCommand=cmd(shadowlength,1;horizalign,left;zoom,0.5;diffuse,ThemeColor.TextDark)
 		},
-		Def.RollingNumbers {
+		LoadFont("Common Normal") .. {
 			Name="Value",
-			File=THEME:GetPathF("Common","Normal"),
-			Text="",
-			InitCommand=cmd(horizalign,right;x,radar_value_offset_x;Load,"RollingNumbersPaneDisplayRadarValue"),
-			OnCommand=cmd(shadowlength,1;diffuse,ThemeColor.Secondary;zoom,0.5)
+			InitCommand=cmd(horizalign,right;x,radar_value_offset_x),
+			OnCommand=cmd(shadowlength,1;diffuse,ThemeColor.Text;zoom,0.5)
 		}
 	}
 end

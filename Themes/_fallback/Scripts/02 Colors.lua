@@ -26,17 +26,15 @@ setmetatable(Color, { __call = function(self, c) return self[c] end })
 ThemeColor = {
 	Text			= color("#ffffff"),
 	TextDark		= color("#e6e9ed"),
-	TextDisabled = color("#8a8c8e"),
-	Primary			= color("#ed5565"),
-	PrimaryDark		= color("#da4453"),
-	Secondary		= color("#ffbb33"),
-	SecondaryDark	= color("#ff8800"),
-	Decoration		= color("#efebe9"),
-	DecorationDark	= color("#cecdc3"),
-	DecorationBackground = color("#455a64"),
-	DecorationBackgroundDark = color("#263238"),
-	Background		= color("#656d78"),
-	BackgroundDark	= color("#434a54"),
+	TextDisabled	= color("#8a8c8e"),
+	Primary			= color("#FFEB3B"),
+	PrimaryDark		= color("#FBC02D"),
+	Secondary		= color("#03A9F4"),
+	SecondaryDark	= color("#0288D1"),
+	Decoration		= color("#9E9E9E"),
+	DecorationDark	= color("#616161"),
+	Background		= color("#424242"),
+	BackgroundDark	= color("#212121"),
 }
 
 GameColor = {

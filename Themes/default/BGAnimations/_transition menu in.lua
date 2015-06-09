@@ -2,16 +2,15 @@ local fSleepTime = THEME:GetMetric( Var "LoadingScreen","ScreenInDelay")
 
 local t = Def.ActorFrame {
 	InitCommand=cmd(xy,SCREEN_CENTER_X,SCREEN_CENTER_Y),
-	OnCommand=cmd(sleep,0.25+fSleepTime)
+	StartTransitioningCommand=cmd(sleep,fSleepTime)
 }
 
 local swipe = Def.ActorFrame {
-	InitCommand=cmd(x,-SCREEN_WIDTH * 2),
-	OnCommand=cmd(linear,0.5;x,0),
+	OnCommand=cmd(decelerate,TIME_TRANSITION;x,SCREEN_WIDTH * 2),
 	--
 	Def.Quad {
-		InitCommand=cmd(zoomto,SCREEN_CENTER_X,SCREEN_HEIGHT;x,SCREEN_CENTER_X;horizalign,left),
-		OnCommand=cmd(diffuse,Color.Black;faderight,1)
+		InitCommand=cmd(zoomto,SCREEN_CENTER_X,SCREEN_HEIGHT;x,-SCREEN_CENTER_X;horizalign,right),
+		OnCommand=cmd(diffuse,Color.Black;fadeleft,1)
 	},
 	Def.Quad {
 		InitCommand=cmd(zoomto,SCREEN_WIDTH,SCREEN_HEIGHT),

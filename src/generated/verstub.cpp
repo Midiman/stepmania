@@ -1,0 +1,9 @@
+extern unsigned long const version_num = 3;
+extern int const sm_version_major = 5;
+extern int const sm_version_minor = 0;
+extern int const sm_version_patch = 8;
+extern char const * const sm_version_git_hash = "2fa8ca0";
+extern char const * const sm_version_traditional = "5.0.8";
+extern char const * const version_date = "20150601";
+extern char const * const version_time = "22:47:35 Pacific Daylight Time";
+extern char const * const product_version = "5.0-git-2fa8ca0";

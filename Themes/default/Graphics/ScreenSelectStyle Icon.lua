@@ -5,10 +5,17 @@ local string_expl = THEME:GetString("StyleType", gc:GetStyle():GetStyleType());
 local icon_color = color("#FFCB05");
 local icon_color2 = color("#F0BA00");
 
+local icon_delay = TIME_INSTANT * math.max(0,gc:GetIndex() - 1)
+
 local t = Def.ActorFrame {};
 t[#t+1] = Def.ActorFrame { 
 	GainFocusCommand=THEME:GetMetric(Var "LoadingScreen","IconGainFocusCommand");
 	LoseFocusCommand=THEME:GetMetric(Var "LoadingScreen","IconLoseFocusCommand");
+	
+	InitCommand=cmd();
+	OnCommand=cmd(diffusealpha,0;addy,-8;sleep,icon_delay;decelerate,TIME_NORMAL;addy,8;diffusealpha,1);
+	
+	OffUnfocusedCommand=cmd(finishtweening;sleep,icon_delay;accelerate,TIME_SHORT;addy,8;diffusealpha,0);
 
 	LoadActor(THEME:GetPathG("ScreenSelectPlayMode", "icon/_background base"))..{
 		--OnCommand=cmd(diffuse,ThemeColor.DecorationBackgroundDark),
@@ -44,4 +51,6 @@ t[#t+1] = Def.ActorFrame {
 		EnabledCommand=cmd(diffuse,color("1,1,1,0"));
 	};
 };
+
+t.OffFocusedCommand=cmd(finishtweening;sleep,TIME_NORMAL;smooth,TIME_NORMAL;Center;sleep,TIME_LONG;decelerate,TIME_SHORT;diffusealpha,0;addy,8);
 return t
