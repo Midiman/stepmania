@@ -501,8 +501,6 @@ bool NoteDisplay::DrawHoldsInRange(const NoteFieldRenderArgs& field_args,
 		}
 
 		bool is_addition = (tn.source == TapNoteSource_Addition);
-		bool hopo_possible = (tn.bHopoPossible);
-		bool use_addition_coloring = is_addition || hopo_possible;
 		const bool hold_ghost_showing = tn.HoldResult.bActive  &&  tn.HoldResult.fLife > 0;
 		const bool is_holding = tn.HoldResult.bHeld;
 		if(hold_ghost_showing)
@@ -520,7 +518,7 @@ bool NoteDisplay::DrawHoldsInRange(const NoteFieldRenderArgs& field_args,
 		}
 
 		DrawHold(tn, field_args, column_args, start_row, is_holding, result,
-			use_addition_coloring,
+			is_addition,
 			in_selection_range ? field_args.selection_glow : field_args.fail_fade);
 
 		bool note_upcoming = NoteRowToBeat(start_row) >
@@ -602,12 +600,10 @@ bool NoteDisplay::DrawTapsInRange(const NoteFieldRenderArgs& field_args,
 		}
 
 		bool is_addition = (tn.source == TapNoteSource_Addition);
-		bool hopo_possible = (tn.bHopoPossible);
-		bool use_addition_coloring = is_addition || hopo_possible;
 		DrawTap(tn, field_args, column_args,
 			NoteRowToVisibleBeat(m_pPlayerState, tap_row),
 			hold_begins_on_this_beat, roll_begins_on_this_beat,
-			use_addition_coloring,
+			is_addition,
 			in_selection_range ? field_args.selection_glow : field_args.fail_fade);
 
 		any_upcoming |= NoteRowToBeat(tap_row) >
@@ -756,7 +752,12 @@ void NoteDisplay::DrawHoldPart(vector<Sprite*> &vpSpr,
 	/* Only draw the section that's within the range specified.  If a hold note is
 	 * very long, don't process or draw the part outside of the range.  Don't change
 	 * part_args.y_top or part_args.y_bottom; they need to be left alone to calculate texture coordinates. */
-	const float y_start_pos = max(part_args.y_top, part_args.y_start_pos);
+	// If hold body, draw texture to the outside screen.(fix by A.C)
+	float y_start_pos = (part_type == hpt_body) ? part_args.y_top : max(part_args.y_top, part_args.y_start_pos);
+	if (part_args.y_top < part_args.y_start_pos - unzoomed_frame_height)
+	{
+		y_start_pos = fmod((y_start_pos - part_args.y_start_pos), unzoomed_frame_height) + part_args.y_start_pos;
+	}
 	float y_end_pos = min(part_args.y_bottom, part_args.y_end_pos);
 	const float color_scale= glow ? 1 : part_args.color_scale;
 	if(part_type == hpt_body)
@@ -787,8 +788,8 @@ void NoteDisplay::DrawHoldPart(vector<Sprite*> &vpSpr,
 		{
 			/* For very large hold notes, shift the texture coordinates to be near 0, so we
 			 * don't send very large values to the renderer. */
-			const float fDistFromTop	= y_start_pos - part_args.y_top;
-			float fTexCoordTop		= SCALE(fDistFromTop, 0, unzoomed_frame_height, rect.top, rect.bottom);
+			const float fDistFromTop = y_start_pos - part_args.y_top;
+			float fTexCoordTop = SCALE(fDistFromTop, 0, unzoomed_frame_height, rect.top, rect.bottom);
 			fTexCoordTop += add_to_tex_coord;
 			add_to_tex_coord -= floorf(fTexCoordTop);
 		}
@@ -799,11 +800,11 @@ void NoteDisplay::DrawHoldPart(vector<Sprite*> &vpSpr,
 	{
 		if (!part_args.anchor_to_top)
 		{
-			float offset = unzoomed_frame_height - (y_end_pos - y_start_pos);
+			float offset = unzoomed_frame_height - (y_end_pos - y_start_pos) / ae_zoom;
 			// ロングノート本体の長さがunzoomed_frame_height→0のときに、add_to_tex_coordを0→1にすればOK
 			// つまり、offsetを0→unzoomed_frame_heightにすると理想通りの表示になる -A.C
 			// Shift texture coord to fit hold length If hold length is less than
-			// bottomcap frame size. (translated by hanubeki)
+			// bottomcap frame height. (translated by hanubeki)
 			if (offset>0){
 				add_to_tex_coord = SCALE(offset, 0.0f, unzoomed_frame_height, 0.0f, 1.0f);
 			}

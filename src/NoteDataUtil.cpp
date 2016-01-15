@@ -2759,6 +2759,8 @@ void NoteDataUtil::TransformNoteData( NoteData &nd, const PlayerOptions &po, Ste
 	if( po.m_bTurns[PlayerOptions::TURN_SHUFFLE] )			NoteDataUtil::Turn( nd, st, NoteDataUtil::shuffle, iStartIndex, iEndIndex );
 	if( po.m_bTurns[PlayerOptions::TURN_SOFT_SHUFFLE] )			NoteDataUtil::Turn( nd, st, NoteDataUtil::soft_shuffle, iStartIndex, iEndIndex );
 	if( po.m_bTurns[PlayerOptions::TURN_SUPER_SHUFFLE] )		NoteDataUtil::Turn( nd, st, NoteDataUtil::super_shuffle, iStartIndex, iEndIndex );
+
+	nd.RevalidateATIs(vector<int>(), false);
 }
 
 void NoteDataUtil::AddTapAttacks( NoteData &nd, Song* pSong )
@@ -3004,34 +3006,6 @@ bool NoteDataUtil::GetPrevEditorPosition( const NoteData& in, int &rowInOut )
 	return true;
 }
 
-extern Preference<float> g_fTimingWindowHopo;
-
-
-void NoteDataUtil::SetHopoPossibleFlags( const Song *pSong, NoteData& ndInOut )
-{
-	float fLastRowMusicSeconds = -1;
-	int iLastTapTrackOfLastRow = -1;
-	FOREACH_NONEMPTY_ROW_ALL_TRACKS( ndInOut, r )
-	{
-		float fBeat = NoteRowToBeat( r );
-		float fSeconds = pSong->m_SongTiming.GetElapsedTimeFromBeat( fBeat );
-
-		int iLastTapTrack = ndInOut.GetLastTrackWithTapOrHoldHead( r );
-		if( iLastTapTrack != -1  &&  fSeconds <= fLastRowMusicSeconds + g_fTimingWindowHopo )
-		{
-			int iNumNotesInRow = ndInOut.GetNumTapNotesInRow( r );
-			TapNote &tn = ndInOut.FindTapNote( iLastTapTrack, r )->second;
-		
-			if( iNumNotesInRow == 1  &&  iLastTapTrack != iLastTapTrackOfLastRow )
-			{
-				tn.bHopoPossible = true;
-			}
-		}
-
-		fLastRowMusicSeconds = fSeconds;
-		iLastTapTrackOfLastRow = iLastTapTrack;
-	}
-}
 
 unsigned int NoteDataUtil::GetTotalHoldTicks( NoteData* nd, const TimingData* td )
 {

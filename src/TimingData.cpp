@@ -1,6 +1,7 @@
 #include "global.h"
 #include "TimingData.h"
 #include "PrefsManager.h"
+#include "GameState.h"
 #include "RageUtil.h"
 #include "RageLog.h"
 #include "ThemeManager.h"
@@ -142,7 +143,7 @@ void TimingData::DumpOneTable(const beat_start_lookup_t& lookup, const RString& 
 			SegInfoStr(stops, starts.stop, "stop").c_str(),
 			SegInfoStr(delays, starts.delay, "delay").c_str(),
 			starts.last_row, starts.last_time, starts.warp_destination, starts.is_warping);
-		LOG->Trace(str.c_str());
+		LOG->Trace("%s", str.c_str());
 	}
 }
 
@@ -534,7 +535,7 @@ TimingSegment* TimingData::GetSegmentAtRow( int iNoteRow, TimingSegmentType tst 
 
 static void EraseSegment( vector<TimingSegment*> &vSegs, int index, TimingSegment *cur )
 {
-#ifdef DEBUG
+#ifdef WITH_LOGGING_TIMING_DATA
 	LOG->Trace( "EraseSegment(%d, %p)", index, cur );
 	cur->DebugPrint();
 #endif
@@ -547,7 +548,7 @@ static void EraseSegment( vector<TimingSegment*> &vSegs, int index, TimingSegmen
 // so we must deep-copy it (with ::Copy) for new allocations.
 void TimingData::AddSegment( const TimingSegment *seg )
 {
-#ifdef DEBUG
+#ifdef WITH_LOGGING_TIMING_DATA
 	LOG->Trace( "AddSegment( %s )", TimingSegmentTypeToString(seg->GetType()).c_str() );
 	seg->DebugPrint();
 #endif
@@ -666,7 +667,7 @@ void TimingData::AddSegment( const TimingSegment *seg )
 	// the segment at or before this row is equal to the new one; ignore it
 	if( bOnSameRow && (*cur) == (*seg) )
 	{
-#if defined(DEBUG)
+#ifdef WITH_LOGGING_TIMING_DATA
 		LOG->Trace( "equals previous segment, ignoring" );
 #endif
 		return;
@@ -704,7 +705,7 @@ bool TimingData::DoesLabelExist( const RString& sLabel ) const
 
 void TimingData::GetBeatAndBPSFromElapsedTime(GetBeatArgs& args) const
 {
-	args.elapsed_time += PREFSMAN->m_fGlobalOffsetSeconds;
+	args.elapsed_time += GAMESTATE->m_SongOptions.GetCurrent().m_fMusicRate * PREFSMAN->m_fGlobalOffsetSeconds;
 	GetBeatAndBPSFromElapsedTimeNoOffset(args);
 }
 
@@ -945,7 +946,8 @@ float TimingData::GetElapsedTimeInternal(GetBeatStarts& start, float beat,
 
 float TimingData::GetElapsedTimeFromBeat( float fBeat ) const
 {
-	return TimingData::GetElapsedTimeFromBeatNoOffset( fBeat ) - PREFSMAN->m_fGlobalOffsetSeconds;
+	return TimingData::GetElapsedTimeFromBeatNoOffset( fBeat )
+		- GAMESTATE->m_SongOptions.GetCurrent().m_fMusicRate * PREFSMAN->m_fGlobalOffsetSeconds;
 }
 
 float TimingData::GetElapsedTimeFromBeatNoOffset( float fBeat ) const
@@ -1098,7 +1100,7 @@ float TimingData::GetDisplayedSpeedPercent( float fSongBeat, float fMusicSeconds
 	if( speeds.size() == 0 )
 	{
 #ifdef DEBUG
-		LOG->Trace("No speed segments");
+		LOG->Trace("No speed segments found: using default value.");
 #endif
 		return 1.0f;
 	}

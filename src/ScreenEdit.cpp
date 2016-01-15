@@ -4,6 +4,7 @@
 #include "ScreenEdit.h"
 #include "ActorUtil.h"
 #include "AdjustSync.h"
+#include "ArrowEffects.h"
 #include "BackgroundUtil.h"
 #include "CommonMetrics.h"
 #include "Foreach.h"
@@ -115,6 +116,7 @@ AutoScreenMessage( SM_DoSaveAndExit );
 AutoScreenMessage( SM_DoExit );
 AutoScreenMessage( SM_AutoSaveSuccessful );
 AutoScreenMessage( SM_SaveSuccessful );
+AutoScreenMessage( SM_SaveSuccessNoSM );
 AutoScreenMessage( SM_SaveFailed );
 
 static const char *EditStateNames[] = {
@@ -1710,6 +1712,7 @@ void ScreenEdit::Update( float fDeltaTime )
 	//
 	if( m_EditState == STATE_RECORDING  ||  m_EditState == STATE_PLAYING )
 	{
+		ArrowEffects::Update();
 		/*
 		 * If any arrow is being held, continue for up to half a second after
 		 * the end marker.  This makes it possible to start a hold note near
@@ -1865,7 +1868,8 @@ void ScreenEdit::UpdateTextInfo()
 
 	RString sText;
 	sText += ssprintf( CURRENT_BEAT_FORMAT.GetValue(), CURRENT_BEAT.GetValue().c_str(), GetBeat() );
-	sText += ssprintf( CURRENT_SECOND_FORMAT.GetValue(), CURRENT_SECOND.GetValue().c_str(), GetAppropriateTiming().GetElapsedTimeFromBeat(GetBeat()) );
+	float second= GetAppropriateTiming().GetElapsedTimeFromBeatNoOffset(GetBeat());
+	sText += ssprintf( CURRENT_SECOND_FORMAT.GetValue(), CURRENT_SECOND.GetValue().c_str(), second );
 	switch( EDIT_MODE.GetValue() )
 	{
 	DEFAULT_FAIL( EDIT_MODE.GetValue() );
@@ -3220,13 +3224,6 @@ bool ScreenEdit::InputPlay( const InputEventPlus &input, EditButton EditB )
 					if( iCol != -1 )
 						m_Player->Step( iCol, -1, input.DeviceI.ts, false, bRelease );
 					return true;
-				case GameButtonType_Fret:
-					if( iCol != -1 )
-						m_Player->Fret( iCol, -1, input.DeviceI.ts, false, bRelease );
-					return true;
-				case GameButtonType_Strum:
-					m_Player->Strum( iCol, -1, input.DeviceI.ts, false, bRelease );
-					return true;
 				default:
 					break;
 				}
@@ -3235,7 +3232,7 @@ bool ScreenEdit::InputPlay( const InputEventPlus &input, EditButton EditB )
 		}
 	}
 
-	if( gbt == GameButtonType_INVALID  &&  input.type == IET_FIRST_PRESS )
+	if( gbt == GameButtonType_Menu  &&  input.type == IET_FIRST_PRESS )
 	{
 		switch( EditB )
 		{
@@ -3375,6 +3372,7 @@ void ScreenEdit::TransitionEditState( EditState em )
 	case STATE_PLAYING:
 	case STATE_RECORDING:
 	{
+		m_NoteDataEdit.RevalidateATIs(vector<int>(), false);
 		if( bStateChanging )
 			AdjustSync::ResetOriginalSyncData();
 
@@ -3388,7 +3386,7 @@ void ScreenEdit::TransitionEditState( EditState em )
 		if (!GAMESTATE->m_bIsUsingStepTiming)
 		{
 			// Substitute the song timing for the step timing during
-			// previuw if we're in song mode
+			// preview if we're in song mode
 			backupStepTiming = GAMESTATE->m_pCurSteps[PLAYER_1]->m_Timing;
 			GAMESTATE->m_pCurSteps[PLAYER_1]->m_Timing.Clear();
 		}
@@ -3595,6 +3593,7 @@ void ScreenEdit::HandleMessage( const Message &msg )
 
 static LocalizedString SAVE_SUCCESSFUL				( "ScreenEdit", "Save successful." );
 static LocalizedString AUTOSAVE_SUCCESSFUL				( "ScreenEdit", "Autosave successful." );
+static LocalizedString SAVE_SUCCESS_NO_SM_SPLIT_TIMING("ScreenEdit", "save_success_no_sm_split_timing");
 
 static LocalizedString ADD_NEW_MOD ("ScreenEdit", "Adding New Mod");
 static LocalizedString ADD_NEW_ATTACK ("ScreenEdit", "Adding New Attack");
@@ -4310,17 +4309,27 @@ void ScreenEdit::HandleScreenMessage( const ScreenMessage SM )
 			break; // do nothing
 		}
 	}
-	else if( SM == SM_SaveSuccessful )
+	else if(SM == SM_SaveSuccessful || SM == SM_SaveSuccessNoSM)
 	{
 		LOG->Trace( "Save successful." );
 		CopyToLastSave();
 		SetDirty( false );
 		SONGMAN->Invalidate( GAMESTATE->m_pCurSong );
 
+		LocalizedString const* message= &SAVE_SUCCESSFUL;
+		if(SM == SM_SaveSuccessNoSM)
+		{
+			message= &SAVE_SUCCESS_NO_SM_SPLIT_TIMING;
+		}
+
 		if( m_CurrentAction == save_on_exit )
-			ScreenPrompt::Prompt( SM_DoExit, SAVE_SUCCESSFUL );
+		{
+			ScreenPrompt::Prompt( SM_DoExit, *message );
+		}
 		else
-			SCREENMAN->SystemMessage( SAVE_SUCCESSFUL );
+		{
+			SCREENMAN->SystemMessage( *message );
+		}
 	}
 	else if( SM == SM_AutoSaveSuccessful )
 	{
@@ -4424,8 +4433,11 @@ void ScreenEdit::PerformSave(bool autosave)
 	m_pSteps->m_Attacks = GAMESTATE->m_pCurSteps[PLAYER_1]->m_Attacks;
 	m_pSteps->m_sAttackString = GAMESTATE->m_pCurSteps[PLAYER_1]->m_Attacks.ToVectorString();
 
+	// If one of the charts uses split timing, then it cannot be accurately
+	// saved in the .sm format.  So saving the .sm is disabled.
+	bool uses_split= m_pSong->AnyChartUsesSplitTiming();
 	const ScreenMessage save_message= autosave ? SM_AutoSaveSuccessful
-		: SM_SaveSuccessful;
+		: (uses_split ? SM_SaveSuccessNoSM : SM_SaveSuccessful);
 
 	switch( EDIT_MODE.GetValue() )
 	{
@@ -6092,9 +6104,10 @@ void ScreenEdit::SetupCourseAttacks()
 			{
 				FOREACH(Attack, attacks, attack)
 				{
-					float fBeat = GetAppropriateTiming().GetBeatFromElapsedTime(attack->fStartSecond);
-					if (fBeat >= GetBeat())
-						GAMESTATE->m_pPlayerState[PLAYER_1]->LaunchAttack( *attack );
+					// LaunchAttack is actually a misnomer.  The function actually adds
+					// the attack to a list in the PlayerState which is checked and
+					// updated every tick to see which ones to actually activate. -Kyz
+					GAMESTATE->m_pPlayerState[PLAYER_1]->LaunchAttack( *attack );
 				}
 			}
 		}
